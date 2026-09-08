@@ -99,8 +99,12 @@ export const SITES: { key: string; label: string; url: string }[] = [
     label: "NUS March Grad Show",
     url: "https://nusmarchgradshow.com",
   },
-  { key: "ashmistry", label: "Ashmistry", url: "" },
-  { key: "positivejamtravel", label: "Positive Jam Travel", url: "" },
+  { key: "ashmistry", label: "Ashmistry", url: "https://www.ashmistry.com" },
+  {
+    key: "positivejamtravel",
+    label: "Positive Jam Travel",
+    url: "https://positivejamfest.com",
+  },
 ];
 
 export function siteUrl(): string {
