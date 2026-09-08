@@ -1261,3 +1261,32 @@ button {
 .btn-app:hover {
   background: var(--accent-dark);
 }
+
+/* Contextual cross-site link inside the article body. Reads as an editorial
+   aside rather than a widget, and stays a plain crawlable anchor. */
+.article-body .cross-link {
+  margin: 1.5rem 0;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--accent-border);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.article-body .cross-link span {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 0.7rem;
+  color: var(--accent-dark);
+}
+
+.article-body .cross-link a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.article-body .cross-link a:hover {
+  color: var(--accent-dark);
+}

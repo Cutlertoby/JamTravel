@@ -1,11 +1,21 @@
 import type { Post } from "@/lib/types";
+import type { CrossSiteLink } from "@/lib/related";
 
 // Renders the article body in the exact section order the CRM + pipeline use:
 // quick answer → intro → sections → pull quote → steps → tips → closing → FAQs.
 // Shared by the public article page and the admin live preview so they never
 // drift apart. Styling lives in globals.css under `.article-body`.
+//
+// `crossLink`, when supplied, renders a contextual link to a related article on
+// another site in the network, placed mid-body between sections.
 
-export default function ArticleBody({ post }: { post: Post }) {
+export default function ArticleBody({
+  post,
+  crossLink,
+}: {
+  post: Post;
+  crossLink?: CrossSiteLink | null;
+}) {
   const intro = post.intro_paragraphs || [];
   const sections = post.sections || [];
   const steps = post.steps || [];
@@ -42,6 +52,12 @@ export default function ArticleBody({ post }: { post: Post }) {
             <a href={s.cta_url} target="_blank" rel="noopener noreferrer" className="inline-download-btn">
               {s.cta_text}
             </a>
+          ) : null}
+          {crossLink && crossLink.afterSection === i ? (
+            <p className="cross-link">
+              <span>Related:</span>{" "}
+              <a href={crossLink.href}>{crossLink.title}</a>
+            </p>
           ) : null}
         </section>
       ))}
