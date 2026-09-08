@@ -6,7 +6,7 @@ import { REST_BASE, supabaseHeaders } from "@/lib/supabase";
 import { renderBlogHTML } from "@/lib/articleHtml";
 import { formatDate } from "@/lib/format";
 import ArticleBody from "@/components/ArticleBody";
-import { SITE } from "@/lib/types";
+import { SITE, SITE_KEY, SITES } from "@/lib/types";
 import type { Post, PostStatus, Section } from "@/lib/types";
 
 type Tab =
@@ -213,6 +213,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [errored, setErrored] = useState(false);
   const [tab, setTab] = useState<Tab>("dashboard");
+  // Which site's content this desk is currently working on. Defaults to this
+  // deployment's own site; switching it re-scopes the whole dashboard, and
+  // anything created while it's set posts to that site instead.
+  const [activeSite, setActiveSite] = useState<string>(SITE_KEY);
   const [openId, setOpenId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [edit, setEdit] = useState<EditState | null>(null);
@@ -233,7 +237,7 @@ export default function AdminDashboard() {
     setErrored(false);
     try {
       const res = await fetch(
-        `${REST_BASE}/posts?select=*&site=eq.ashmistry&order=created_at.desc`,
+        `${REST_BASE}/posts?select=*&site=eq.${activeSite}&order=created_at.desc`,
         { headers: supabaseHeaders(), cache: "no-store" }
       );
       if (!res.ok) throw new Error(String(res.status));
@@ -244,7 +248,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, activeSite]);
 
   useEffect(() => {
     fetchPosts();
@@ -282,7 +286,7 @@ export default function AdminDashboard() {
         title: "Untitled article",
         slug: `untitled-${Date.now()}`,
         status: "pending_review",
-        site: "ashmistry",
+        site: activeSite,
       };
       const res = await fetch(`${REST_BASE}/posts`, {
         method: "POST",
@@ -478,6 +482,32 @@ export default function AdminDashboard() {
             {SITE.name}
             <small>Content desk</small>
           </span>
+        </div>
+
+        {/* Which site this desk is posting to. Every deployment reads the same
+            Supabase table, so one dashboard can run all of them. */}
+        <div className="site-switcher">
+          <label htmlFor="site-select">Working on</label>
+          <select
+            id="site-select"
+            value={activeSite}
+            onChange={(e) => {
+              setActiveSite(e.target.value);
+              closeReader();
+            }}
+          >
+            {SITES.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+                {s.key === SITE_KEY ? " (this site)" : ""}
+              </option>
+            ))}
+          </select>
+          {activeSite !== SITE_KEY ? (
+            <p className="site-switcher-note">
+              Posting to another site — it won’t appear on this domain.
+            </p>
+          ) : null}
         </div>
 
         <nav className="nav-section">

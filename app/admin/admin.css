@@ -958,3 +958,52 @@
     padding: 1.25rem;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Site switcher — one desk, many sites. All deployments share the Supabase
+   `posts` table, so the dashboard can scope itself to any of them.
+   ------------------------------------------------------------------------ */
+.site-switcher {
+  padding: 0 0.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1rem;
+}
+
+.site-switcher label {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  opacity: 0.55;
+  margin-bottom: 0.4rem;
+}
+
+.site-switcher select {
+  width: 100%;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  cursor: pointer;
+}
+
+.site-switcher select:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 1px;
+}
+
+.site-switcher select option {
+  color: #111;
+}
+
+.site-switcher-note {
+  margin-top: 0.45rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  opacity: 0.7;
+}

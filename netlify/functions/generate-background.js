@@ -143,7 +143,7 @@ Return EXACTLY this JSON with NO other text:
   "cta_headline": "specific to this article pain point",
   "cta_subtext": "1 sentence tying LocalPay to the article topic",
   "status": "pending_review",
-  "site": "ashmistry"
+  "site": "positivejamtravel"
 }`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
