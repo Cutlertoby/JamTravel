@@ -7,6 +7,7 @@ import {
   getPublishedPosts,
 } from "@/lib/posts";
 import ArticleBody from "@/components/ArticleBody";
+import { getCrossSiteLink } from "@/lib/related";
 import { Card, articleImage } from "@/components/cards";
 import { SITE, APP_PROMO, siteUrl } from "@/lib/types";
 import { formatDate, readTime, categorySlug } from "@/lib/format";
@@ -67,6 +68,7 @@ export default async function ArticlePage({
   const description =
     post.meta_description || post.standfirst || SITE.description;
   const image = await articleImage(post);
+  const crossLink = await getCrossSiteLink(post);
   const all = await getPublishedPosts(100);
   const related = all
     .filter(
@@ -165,7 +167,7 @@ export default async function ArticlePage({
           <img src={image} alt={post.title} />
         </div>
 
-        <ArticleBody post={post} />
+        <ArticleBody post={post} crossLink={crossLink} />
 
         {ESIM_CTA_SLUGS.includes(post.slug) ? (
           <div className="article-cta">

@@ -88,11 +88,19 @@ export const SITE_KEY = "positivejamtravel";
 // deployment only ever reads its own SITE_KEY, but the admin desk can switch
 // between them so one dashboard can review and publish for every site.
 // Keep this list identical across deployments.
+//
+// `url` is the site's live origin, used to build absolute cross-site links in
+// article bodies. Leave it empty and the site is simply never linked to —
+// no broken links — so it's safe to fill these in as domains go live.
 // ---------------------------------------------------------------------------
-export const SITES: { key: string; label: string }[] = [
-  { key: "nusmarchgradshow", label: "NUS March Grad Show" },
-  { key: "ashmistry", label: "Ashmistry" },
-  { key: "positivejamtravel", label: "Positive Jam Travel" },
+export const SITES: { key: string; label: string; url: string }[] = [
+  {
+    key: "nusmarchgradshow",
+    label: "NUS March Grad Show",
+    url: "https://nusmarchgradshow.com",
+  },
+  { key: "ashmistry", label: "Ashmistry", url: "" },
+  { key: "positivejamtravel", label: "Positive Jam Travel", url: "" },
 ];
 
 export function siteUrl(): string {
