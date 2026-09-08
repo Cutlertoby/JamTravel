@@ -83,6 +83,18 @@ export const SITE = {
 // query filters on it, so it must stay unique per deployed site.
 export const SITE_KEY = "positivejamtravel";
 
+// ---------------------------------------------------------------------------
+// All sites sharing this Supabase `posts` table. The public side of each
+// deployment only ever reads its own SITE_KEY, but the admin desk can switch
+// between them so one dashboard can review and publish for every site.
+// Keep this list identical across deployments.
+// ---------------------------------------------------------------------------
+export const SITES: { key: string; label: string }[] = [
+  { key: "nusmarchgradshow", label: "NUS March Grad Show" },
+  { key: "ashmistry", label: "Ashmistry" },
+  { key: "positivejamtravel", label: "Positive Jam Travel" },
+];
+
 export function siteUrl(): string {
   return (
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
