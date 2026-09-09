@@ -315,7 +315,12 @@ export default function AdminDashboard() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: genPrompt.trim() || null }),
+          // Generate for whichever site the desk is currently working on,
+          // not just this deployment's own site.
+          body: JSON.stringify({
+            prompt: genPrompt.trim() || null,
+            site: activeSite,
+          }),
         }
       );
       if (!res.ok) throw new Error(String(res.status));
