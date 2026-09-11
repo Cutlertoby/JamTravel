@@ -53,7 +53,8 @@ jobs:
           echo "Requesting a $STATUS article for $SITE_KEY"
           PAYLOAD=$(jq -nc --arg s "$SITE_KEY" --arg st "$STATUS" --arg p "$PROMPT" \
             '{site: $s, status: $st} + (if $p == "" then {} else {prompt: $p} end)')
-          CODE=$(curl -sS -o /tmp/trigger.out -w '%{http_code}' -X POST \
+          CODE=$(curl -sS -L --post301 --post302 --post303 \
+            -o /tmp/trigger.out -w '%{http_code}' -X POST \
             "$ORIGIN/.netlify/functions/generate-background" \
             -H 'Content-Type: application/json' --data "$PAYLOAD")
           echo "HTTP $CODE"; cat /tmp/trigger.out; echo
@@ -63,6 +64,7 @@ jobs:
       - name: Wait for the new article to land
         run: |
           BEFORE='${{ steps.before.outputs.slug }}'
+          STATUS="${{ inputs.status || 'published' }}"
           for i in $(seq 1 40); do
             sleep 30
             ROW=$(curl -sS -G "$SUPABASE_URL/rest/v1/posts" \
@@ -74,6 +76,13 @@ jobs:
             SLUG=$(printf '%s' "$ROW" | jq -r '.[0].slug // ""')
             if [ -n "$SLUG" ] && [ "$SLUG" != "$BEFORE" ]; then
               echo "New article after $((i * 30))s: $ROW"
+              GOT=$(printf '%s' "$ROW" | jq -r '.[0].status')
+              if [ "$GOT" != "$STATUS" ]; then
+                # Almost always means Netlify is still serving an older build
+                # of the function, which ignores the requested status.
+                echo "::error::asked for $STATUS but the article landed as $GOT"
+                exit 1
+              fi
               {
                 echo "### New article for $SITE_KEY"
                 printf '%s' "$ROW" | jq -r '.[0] | "**\(.title)**\n\nstatus: `\(.status)`"'
