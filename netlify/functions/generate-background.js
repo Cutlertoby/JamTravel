@@ -369,10 +369,15 @@ export const handler = async (event) => {
 
   let adminPrompt = null;
   let site = DEFAULT_SITE;
+  let status = "pending_review";
   try {
     const body = JSON.parse(event.body || "{}");
     adminPrompt = body.prompt || null;
     if (typeof body.site === "string" && body.site.trim()) site = body.site.trim();
+    // Whitelisted, never taken verbatim from the caller: the scheduled daily
+    // job publishes straight away, the admin's manual button keeps the review
+    // step. Anything else falls back to review.
+    if (body.status === "published") status = "published";
   } catch {}
 
   try {
@@ -402,7 +407,8 @@ export const handler = async (event) => {
 
     console.log("[generate-background] generating article...");
     const article = await generateArticle({ research, coverage, adminPrompt, site, plan });
-    console.log(`[generate-background] title: ${article.title}`);
+    article.status = status;
+    console.log(`[generate-background] title: ${article.title} (${status})`);
 
     const saved = await saveToSupabase(article);
     if (!saved) {
