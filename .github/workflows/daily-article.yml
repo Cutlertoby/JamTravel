@@ -33,6 +33,8 @@ env:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - name: Record the newest existing article
         id: before
@@ -46,7 +48,33 @@ jobs:
           echo "Newest before: $ROW"
           echo "slug=$(printf '%s' "$ROW" | jq -r '.[0].slug // ""')" >> "$GITHUB_OUTPUT"
 
-      - name: Trigger generation
+      - name: Check out
+        if: env.ANTHROPIC_API_KEY != ''
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        if: env.ANTHROPIC_API_KEY != ''
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Generate here
+        # Preferred path. Running the generator on the runner keeps the
+        # Netlify build off the critical path — a stale or failing deploy
+        # would otherwise keep serving an older generator that ignores the
+        # requested status, which is exactly what happened on first run.
+        if: env.ANTHROPIC_API_KEY != ''
+        run: |
+          npm ci
+          node scripts/generate.mjs \
+            "$SITE_KEY" "${{ inputs.status || 'published' }}" "${{ inputs.prompt }}"
+        env:
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+
+      - name: Trigger generation on the deployed site
+        # Fallback for as long as ANTHROPIC_API_KEY is not a repo secret:
+        # fire the deployed background function over HTTP instead.
+        if: env.ANTHROPIC_API_KEY == ''
         run: |
           STATUS="${{ inputs.status || 'published' }}"
           PROMPT="${{ inputs.prompt }}"
